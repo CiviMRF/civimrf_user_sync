@@ -1,0 +1,10 @@
+name = Roparun User Synchronisation
+description = Teamcaptain to user synchronisation.
+core = 7.x
+
+package = "Roparun"
+version = "7.x-1.0"
+
+dependencies[] = cmrf_core
+
+configure = admin/config/civimrf/roparun_user_sync

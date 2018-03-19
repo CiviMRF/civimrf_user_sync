@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * Implements hook_enable().
+ */
+function roparun_user_sync_enable() {
+  // Check if our field is not already created.
+  if (!field_info_field('field_roparun_user_sync_uid')) {
+    $field = array(
+        'field_name' => 'field_roparun_user_sync_uid', 
+        'type' => 'number_integer', 
+    );
+    field_create_field($field);
+
+    // Create the instance on the bundle.
+    $instance = array(
+        'field_name' => 'field_roparun_user_sync_uid', 
+        'entity_type' => 'user', 
+        'label' => 'Roparun User Sync UID', 
+        'bundle' => 'user', 
+        // If you don't set the "required" property then the field wont be required by default.
+        'required' => FALSE,
+        'settings' => array(
+           // Here you inform either or not you want this field showing up on the registration form.
+            'user_register_form' => 0,
+        ),
+        'widget' => array(
+            'type' => 'textfield',
+            'weight' => '1',
+            '#attributes' => array('disabled' => TRUE),
+        ), 
+    );
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_disable().
+ */
+function roparun_user_sync_disable() {
+	variable_del('roparun_user_sync_profile');
+	variable_del('roparun_user_sync_cache');
+	variable_del('roparun_user_sync_api_entity');
+	variable_del('roparun_user_sync_api_action');
+	variable_del('roparun_user_sync_uid_attribute');
+	variable_del('roparun_user_sync_username_attribute');
+	variable_del('roparun_user_sync_email_attribute');
+	variable_del(roparun_user_sync_get_connector_name(null));
+  if (function_exists('cmrf_core_list_profiles')) {
+    $profiles = cmrf_core_list_profiles();
+    foreach ($profiles as $profile_name => $profile) {
+      variable_del(roparun_user_sync_get_connector_name($profile_name));
+    }
+  }
+	
+	field_delete_field('field_roparun_user_sync_uid');
+}
