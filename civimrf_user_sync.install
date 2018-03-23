@@ -3,20 +3,20 @@
 /**
  * Implements hook_enable().
  */
-function roparun_user_sync_enable() {
+function civimrf_user_sync_enable() {
   // Check if our field is not already created.
-  if (!field_info_field('field_roparun_user_sync_uid')) {
+  if (!field_info_field('field_civimrf_user_sync_uid')) {
     $field = array(
-        'field_name' => 'field_roparun_user_sync_uid', 
+        'field_name' => 'field_civimrf_user_sync_uid', 
         'type' => 'number_integer', 
     );
     field_create_field($field);
 
     // Create the instance on the bundle.
     $instance = array(
-        'field_name' => 'field_roparun_user_sync_uid', 
+        'field_name' => 'field_civimrf_user_sync_uid', 
         'entity_type' => 'user', 
-        'label' => 'Roparun User Sync UID', 
+        'label' => 'CiviCRM User Sync UID', 
         'bundle' => 'user', 
         // If you don't set the "required" property then the field wont be required by default.
         'required' => FALSE,
@@ -32,26 +32,31 @@ function roparun_user_sync_enable() {
     );
     field_create_instance($instance);
   }
+	
+	// Add our queue class
+	variable_set('queue_class_civimrf_user_sync', 'CiviMRFUserSyncQueue');
 }
 
 /**
  * Implements hook_disable().
  */
-function roparun_user_sync_disable() {
-	variable_del('roparun_user_sync_profile');
-	variable_del('roparun_user_sync_cache');
-	variable_del('roparun_user_sync_api_entity');
-	variable_del('roparun_user_sync_api_action');
-	variable_del('roparun_user_sync_uid_attribute');
-	variable_del('roparun_user_sync_username_attribute');
-	variable_del('roparun_user_sync_email_attribute');
-	variable_del(roparun_user_sync_get_connector_name(null));
+function civimrf_user_sync_disable() {
+	variable_del('civimrf_user_sync_profile');
+	variable_del('civimrf_user_sync_cache');
+	variable_del('civimrf_user_sync_api_entity');
+	variable_del('civimrf_user_sync_api_action');
+	variable_del('civimrf_user_sync_uid_attribute');
+	variable_del('civimrf_user_sync_username_attribute');
+	variable_del('civimrf_user_sync_email_attribute');
+	variable_del(civimrf_user_sync_get_connector_name(null));
   if (function_exists('cmrf_core_list_profiles')) {
     $profiles = cmrf_core_list_profiles();
     foreach ($profiles as $profile_name => $profile) {
-      variable_del(roparun_user_sync_get_connector_name($profile_name));
+      variable_del(civimrf_user_sync_get_connector_name($profile_name));
     }
   }
 	
-	field_delete_field('field_roparun_user_sync_uid');
+	field_delete_field('field_civimrf_user_sync_uid');
+	
+	variable_del('queue_class_civimrf_user_sync');
 }

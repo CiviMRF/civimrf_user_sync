@@ -1,13 +1,13 @@
 <?php
 
-function roparun_user_sync_admin_form($form, &$form_state) {
+function civimrf_user_sync_admin_form($form, &$form_state) {
 	$profiles = cmrf_core_list_profiles();
   $profiles_options = array('' => t(' - Default profile -'));
   foreach($profiles as $profile_name => $profile) {
     $profiles_options[$profile_name] = $profile['label'];
   }
 	
-	$settings = roparun_user_sync_get_settings();
+	$settings = civimrf_user_sync_get_settings();
 	
 	$form['profile']['#type'] = 'select';
   $form['profile']['#title'] = t('CiviMRF Connection profile');
@@ -29,6 +29,17 @@ function roparun_user_sync_admin_form($form, &$form_state) {
 	$form['api_action']['#required'] = true;
   $form['api_action']['#default_value'] = $settings['api_action'];
 	
+	$form['api_count_action']['#type'] = 'textfield';
+  $form['api_count_action']['#title'] = t('CiviCRM Api Count Action');
+	$form['api_count_action']['#required'] = true;
+  $form['api_count_action']['#default_value'] = $settings['api_count_action'];
+	
+	$form['api_parameters']['#type'] = 'textarea';
+  $form['api_parameters']['#title'] = t('CiviCRM Api Parameters');
+	$form['api_parameters']['#description'] = t('Enter the api parameters in JSON format. E.g. {"contact_sub_type": "Student", "is_deleted": "0", "is_deceased": "0"}');
+	$form['api_parameters']['#required'] = true;
+  $form['api_parameters']['#default_value'] = $settings['api_parameters'];
+	
 	$form['uid_attribute']['#type'] = 'textfield';
   $form['uid_attribute']['#title'] = t('UID Attribute');
 	$form['uid_attribute']['#description'] = t('The UID is an unique user id. The attribute is the field in the results of the API call and is stored as a unique identifier at the user record.');
@@ -47,6 +58,27 @@ function roparun_user_sync_admin_form($form, &$form_state) {
 	$form['email_attribute']['#required'] = true;
   $form['email_attribute']['#default_value'] = $settings['email_attribute'];
 	
+	$roles = array_map('check_plain', user_roles(TRUE));
+  // The disabled checkbox subelement for the 'authenticated user' role
+  // must be generated separately and added to the checkboxes element,
+  // because of a limitation in Form API not supporting a single disabled
+  // checkbox within a set of checkboxes.
+  // @todo This should be solved more elegantly. See issue #119038.
+  $checkbox_authenticated = array(
+    '#type' => 'checkbox',
+    '#title' => $roles[DRUPAL_AUTHENTICATED_RID],
+    '#default_value' => TRUE,
+    '#disabled' => TRUE,
+  );
+  unset($roles[DRUPAL_AUTHENTICATED_RID]);
+  $form['roles'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Roles'),
+    '#default_value' =>  $settings['roles'],
+    '#options' => $roles,
+    DRUPAL_AUTHENTICATED_RID => $checkbox_authenticated,
+  );
+	
 	$form['actions']['#type'] = 'actions';
   $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Save configuration'));
 
@@ -54,7 +86,7 @@ function roparun_user_sync_admin_form($form, &$form_state) {
     drupal_set_message(t('The settings have not been saved because of the errors.'), 'error');
   }
 
-  $form['#submit'][] = 'roparun_user_sync_admin_form_submit';
+  $form['#submit'][] = 'civimrf_user_sync_admin_form_submit';
   // By default, render the form using theme_system_settings_form().
   $form['#theme'] = 'system_settings_form';
 	
@@ -64,23 +96,26 @@ function roparun_user_sync_admin_form($form, &$form_state) {
 /**
  * Submit handler for adding a new image style.
  */
-function roparun_user_sync_admin_form_submit($form, &$form_state) {
+function civimrf_user_sync_admin_form_submit($form, &$form_state) {
   form_state_values_clean($form_state);
   $profile = $form_state['values']['profile'];
    
   if ($profile) {
-    variable_set('roparun_user_sync_profile', $profile);
+    variable_set('civimrf_user_sync_profile', $profile);
   } else {
-  	variable_del('roparun_user_sync_profile');
+  	variable_del('civimrf_user_sync_profile');
 	}
 
-	variable_set('roparun_user_sync_cache', $form_state['values']['cache']);
-	variable_set('roparun_user_sync_api_entity', $form_state['values']['api_entity']);
-	variable_set('roparun_user_sync_api_action', $form_state['values']['api_action']);
-	variable_set('roparun_user_sync_uid_attribute', $form_state['values']['uid_attribute']);
-	variable_set('roparun_user_sync_username_attribute', $form_state['values']['username_attribute']);
-	variable_set('roparun_user_sync_email_attribute', $form_state['values']['email_attribute']);
+	variable_set('civimrf_user_sync_cache', $form_state['values']['cache']);
+	variable_set('civimrf_user_sync_api_entity', $form_state['values']['api_entity']);
+	variable_set('civimrf_user_sync_api_action', $form_state['values']['api_action']);
+	variable_set('civimrf_user_sync_api_count_action', $form_state['values']['api_count_action']);
+	variable_set('civimrf_user_sync_api_parameters', $form_state['values']['api_parameters']);
+	variable_set('civimrf_user_sync_uid_attribute', $form_state['values']['uid_attribute']);
+	variable_set('civimrf_user_sync_username_attribute', $form_state['values']['username_attribute']);
+	variable_set('civimrf_user_sync_email_attribute', $form_state['values']['email_attribute']);
+	variable_set('civimrf_user_sync_roles', $form_state['values']['roles']);
 
 	drupal_set_message(t('Settings have been saved'));
-  $form_state['redirect'] = 'admin/config/civimrf/roparun_user_sync';
+  $form_state['redirect'] = 'admin/config/civimrf/civimrf_user_sync';
 }

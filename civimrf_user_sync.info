@@ -1,0 +1,12 @@
+name = CiviCRM User Synchronisation
+description = Synchonise CiviCRM contacts to users.
+core = 7.x
+
+package = "CiviMRF"
+version = "7.x-1.0"
+
+dependencies[] = cmrf_core
+
+configure = admin/config/civimrf/civimrf_user_sync
+
+files[] = CiviMRFUserSyncQueue.inc
