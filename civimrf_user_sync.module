@@ -28,7 +28,6 @@ function civimrf_user_sync_cron() {
 	
 	$parameters = json_decode($settings['api_parameters'], true);
 	$options = array();
-	$paramaters = array();
 	$options['limit'] = 0;
 	$call = civimrf_user_sync_send_call($settings['api_entity'], $settings['api_count_action'], $parameters, $options, $settings['profile']);
 	$userCount = $call->getReply();
