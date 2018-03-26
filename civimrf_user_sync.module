@@ -71,7 +71,6 @@ function civimrf_user_sync_queue_callback($data) {
 	if ($settings['cache']) {
 		$options['cache'] = $settings['cache'];
 	}
-	$paramaters = array();
 	$options['offset'] = $data['offset'];
 	$options['limit'] = $data['limit'];
 	$call = civimrf_user_sync_send_call($settings['api_entity'], $settings['api_action'], $parameters, $options, $settings['profile']);
