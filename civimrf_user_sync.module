@@ -248,6 +248,8 @@ function civimrf_user_sync_get_settings() {
 		'uid_attribute' => variable_get('civimrf_user_sync_uid_attribute', 'id'),
 		'username_attribute' => variable_get('civimrf_user_sync_username_attribute', 'email'),
 		'email_attribute' => variable_get('civimrf_user_sync_email_attribute', 'email'),
+		'hide_username_field' => variable_get('civimrf_hide_username_field', true),
+		'hide_email_field' => variable_get('civimrf_hide_email_field', true),
 		'roles' => variable_get('civimrf_user_sync_roles', array(DRUPAL_AUTHENTICATED_RID)),
 	);
 }
@@ -256,9 +258,16 @@ function civimrf_user_sync_get_settings() {
  * Hide the uid field from the form.
  */
 function civimrf_user_sync_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+  $settings = civimrf_user_sync_get_settings();
   $current_user = user_uid_optional_load();
   if (!in_array('administrator', $current_user->roles)) {
     $form['field_civimrf_user_sync_uid']['#access'] = false;
+  }
+  if ($settings['hide_username_field']) {
+    $form['account']['name']['#access'] = false;
+  }
+  if ($settings['hide_email_field']) {
+    $form['account']['mail']['#access'] = false;
   }
 }
 

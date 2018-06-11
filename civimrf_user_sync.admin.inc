@@ -57,6 +57,16 @@ function civimrf_user_sync_admin_form($form, &$form_state) {
 	$form['email_attribute']['#description'] = t('The attribute is the field in the results of the API call and is stored as the email at the user record.');
 	$form['email_attribute']['#required'] = true;
   $form['email_attribute']['#default_value'] = $settings['email_attribute'];
+  
+  $form['hide_username_field']['#type'] = 'checkbox';
+  $form['hide_username_field']['#title'] = t('Hide username field');
+  $form['hide_username_field']['#description'] = t('Hides the username field from the account page');
+  $form['hide_username_field']['#default_value'] = $settings['hide_username_field'];
+  
+  $form['hide_email_field']['#type'] = 'checkbox';
+  $form['hide_email_field']['#title'] = t('Hide email field');
+  $form['hide_email_field']['#description'] = t('Hides the e-mail field from the account page');
+  $form['hide_email_field']['#default_value'] = $settings['hide_email_field'];
 	
 	$roles = array_map('check_plain', user_roles(TRUE));
   // The disabled checkbox subelement for the 'authenticated user' role
@@ -114,6 +124,8 @@ function civimrf_user_sync_admin_form_submit($form, &$form_state) {
 	variable_set('civimrf_user_sync_uid_attribute', $form_state['values']['uid_attribute']);
 	variable_set('civimrf_user_sync_username_attribute', $form_state['values']['username_attribute']);
 	variable_set('civimrf_user_sync_email_attribute', $form_state['values']['email_attribute']);
+  variable_set('civimrf_hide_username_field', $form_state['values']['hide_username_field']);
+  variable_set('civimrf_hide_email_field', $form_state['values']['hide_email_field']);
 	variable_set('civimrf_user_sync_roles', $form_state['values']['roles']);
 
 	drupal_set_message(t('Settings have been saved'));
