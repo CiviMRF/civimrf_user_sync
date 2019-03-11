@@ -1,7 +1,5 @@
 <?php
 
-const CIVIMRF_USE_SYNC_BATCH_SIZE = 100;
-
 /**
  * Implements hook_menu().
  */
@@ -43,10 +41,10 @@ function civimrf_user_sync_cron() {
 		$count = $userCount['count'];
 	}
 
-	for($i=0; $i<$count; $i = $i + CIVIMRF_USE_SYNC_BATCH_SIZE) {
+	for($i=0; $i<$count; $i = $i + $settings['api_limit']) {
 		$queue->createItem(array(
 			'offset' => $i, 
-			'limit' => CIVIMRF_USE_SYNC_BATCH_SIZE
+			'limit' => $settings['api_limit'],
 		));
 	}
 }
@@ -245,6 +243,7 @@ function civimrf_user_sync_get_settings() {
 		'api_action' => variable_get('civimrf_user_sync_api_action', 'get'),
 		'api_count_action' => variable_get('civimrf_user_sync_api_count_action', 'getcount'),
 		'api_parameters' => variable_get('civimrf_user_sync_api_parameters', '{"contact_sub_type": "Student", "is_deleted": "0", "is_deceased": "0"}'),
+    'api_limit' => variable_get('civimrf_user_sync_api_limit', '100'),
 		'uid_attribute' => variable_get('civimrf_user_sync_uid_attribute', 'id'),
 		'username_attribute' => variable_get('civimrf_user_sync_username_attribute', 'email'),
 		'email_attribute' => variable_get('civimrf_user_sync_email_attribute', 'email'),

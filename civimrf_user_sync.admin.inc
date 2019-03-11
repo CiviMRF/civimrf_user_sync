@@ -39,6 +39,12 @@ function civimrf_user_sync_admin_form($form, &$form_state) {
 	$form['api_parameters']['#description'] = t('Enter the api parameters in JSON format. E.g. {"contact_sub_type": "Student", "is_deleted": "0", "is_deceased": "0"}');
 	$form['api_parameters']['#required'] = true;
   $form['api_parameters']['#default_value'] = $settings['api_parameters'];
+
+  $form['api_limit']['#type'] = 'textfield';
+  $form['api_limit']['#title'] = t('CiviCRM Api Batch Size');
+  $form['api_limit']['#description'] = t('Define the size of the batch. Each time when the synchronize job runs it processes one batch, this setting defines how many users a batch can contain.');
+  $form['api_limit']['#required'] = true;
+  $form['api_limit']['#default_value'] = $settings['api_limit'];
 	
 	$form['uid_attribute']['#type'] = 'textfield';
   $form['uid_attribute']['#title'] = t('UID Attribute');
@@ -121,6 +127,7 @@ function civimrf_user_sync_admin_form_submit($form, &$form_state) {
 	variable_set('civimrf_user_sync_api_action', $form_state['values']['api_action']);
 	variable_set('civimrf_user_sync_api_count_action', $form_state['values']['api_count_action']);
 	variable_set('civimrf_user_sync_api_parameters', $form_state['values']['api_parameters']);
+  variable_set('civimrf_user_sync_api_limit', $form_state['values']['api_limit']);
 	variable_set('civimrf_user_sync_uid_attribute', $form_state['values']['uid_attribute']);
 	variable_set('civimrf_user_sync_username_attribute', $form_state['values']['username_attribute']);
 	variable_set('civimrf_user_sync_email_attribute', $form_state['values']['email_attribute']);
